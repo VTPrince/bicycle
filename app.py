@@ -85,8 +85,8 @@ def get_my_ip():
     print(places)
 
     for key,value in places.items():
-        # return render_template("table_list.html", data = places,city=str(ip.city))
-    return '<h1>final list : '+ places #request.remote_addr
+        #return render_template("table_list.html", data = places,city=str(ip.city))
+    return '<h1>final list : ' #request.remote_addr
 if __name__ == '__main__':
     app.run(debug=True)
 
