@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+
+				<table>
+					<thead>
+					  <tr>
+						<th>Destination</th>
+						<th>Distance</th>
+					  </tr>
+					</thead>
+					<tbody>
+					
+					  {% for key, value in data.items() %}
+  <tr>
+    <td style="border: 1px solid #333" scope="row">{{ key }}</td>
+    <td style="border: 1px solid #333">{{ value }}</td>
+  </tr>
+  {% endfor %}
+					
+					
+					</tbody>
+			
+</body>	
+</html>

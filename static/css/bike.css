@@ -1,0 +1,43 @@
+body {
+  text-align: center;
+}
+svg {
+  width: 70%;
+  height: 70%;
+}
+
+#houses {
+  animation: 10s road infinite linear;
+}
+#road {
+  animation: 4s road infinite linear;
+}
+
+@keyframes road {
+  from {
+  }
+  to {
+    -moz-transform: translateX(-1800px);
+    -webkit-transform: translateX(-1800px);
+    -o-transform: translateX(-1800px);
+    -ms-transform: translateX(-1800px);
+    transform: translateX(-1800px);
+  }
+}
+#part, #car {
+  animation: 2s car infinite;
+}
+
+@keyframes car {
+  from {
+  }
+  50% {
+    -moz-transform: translateY(10px);
+    -webkit-transform: translateY(10px);
+    -o-transform: translateY(10px);
+    -ms-transform: translateY(10px);
+    transform: translateY(10px);
+  }
+  to {
+  }
+}
