@@ -61,6 +61,7 @@ def get_my_ip():
     for i in range(len(y)):
         
         url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins="+str(ip.city)+"&destinations="+y[i]['name']+"units=imperial&key=AIzaSyAl-KQ2kYmnje9S-BXptm8f2X5a_GFBJzg"
+        print(str(ip.city))
         print(y[i]['name'])
         #hotels.append(y[i]['name'])
         #payload={}
