@@ -41,6 +41,7 @@ def get_my_ip():
     text = request.form['text']
     processed_text = text.upper()
     query = processed_text #input('Search query: ')
+    query = query+str(ip.city)
 
     # get method of requests module
     # return response object
