@@ -1,16 +1,117 @@
 # if __name__ == '__main__':
 #     app.run(debug=True)
-from flask import request,Flask,render_template
+from flask import request,Flask,render_template,session,redirect
 from flask import jsonify
 import geocoder
-
+import firebase_admin
+import pyrebase
+import json
+from firebase_admin import credentials, auth
+from functools import wraps
+emaily=[]
+jwtoken=[]
+passwordy=[]
 app = Flask(__name__,template_folder='templates')
 @app.route("/")
 def index():
     return render_template("index.html")
+@app.route('/user_signup',methods=['POST','GET'])
+def user_signup():
+    return render_template('user_signup.html')
+
+@app.route('/user_login',methods=['POST','GET'])
+def user_login():
+    return render_template('user_login.html')
+#Connect to firebase
+cred = credentials.Certificate('fbAdminConfig.json')
+firebase = firebase_admin.initialize_app(cred)
+pb = pyrebase.initialize_app(json.load(open('fbconfig.json')))
+#Data source
+users = []
+#Api route to get users
+
+#Api route to sign up a new user
+@app.route('/signup',methods=["GET","POST"])
+def signup():
+    email = request.form['email'] 
+    password = request.form['password']
+    emaily.append(email)
+    passwordy.append(password)
+    if email is None or password is None:
+        return {'message': 'Error missing email or password'},400
+    try:
+        user = auth.create_user(
+               email=email,
+               password=password
+        )
+        return {'message': f'Successfully created user {user.uid}'},200
+        #return redirext('/token')
+    except Exception as e:
+        return {'message': 'Error creating user'+e},400
+
+#Api route to get a new token for a valid user
+@app.route('/token',methods=["POST","GET"])
+def token():
+    #email = request.form.get('email')
+    email=emaily[0]
+    password=passwordy[0]
+    #password = request.form.get('password')
+    try:
+        user = pb.auth().sign_in_with_email_and_password(email, password)
+        jwt = user['idToken']
+        jwtoken.append(jwt)
+        return {'token': jwt}, 200
+    except:
+        return {'message': 'There was an error logging in'},400
+def check_token(f):
+    @wraps(f)
+    def wrap(*args,**kwargs):
+        if not jwtoken[0]: #request.headers.get('authorization'):
+            return {'message': 'No token provided'},400
+        try:
+            user = auth.verify_id_token(jwtoken[0])#request.headers['authorization'])
+            users.append(user)
+            request.user = user
+        except:
+            return {'message':'Invalid token provided.'},400
+        return f(*args, **kwargs)
+    return wrap
+
+#Logout User
+@app.route('/logout')
+def logout():
+    session.pop('user')
+    return redirect('/')
+
+#Login User
+@app.route('/login',methods=['GET','POST'])
+def login():
+    if('user' in session):
+        return 'hi'
+    else:
+        email = request.form.get('email')
+        #email=emaily[0]
+        #password=passwordy[0]
+        password = request.form.get('password')
+        try:
+            user = pb.auth().sign_in_with_email_and_password(email, password)
+            session['user']=user
+            return {'message': "user logged in"}, 200
+        except:
+            return {'message': 'There was an error logging in'},400
+
+
+@app.route('/userinfo')
+@check_token
+def userinfo():
+    return {'data': users}, 200
+
+
+
 @app.route("/service")
 def service():
     return render_template("service.html")
+
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -41,7 +142,7 @@ def get_my_ip():
     text = request.form['text']
     processed_text = text.upper()
     query = processed_text #input('Search query: ')
-
+    query = query+str(ip.city)
     # get method of requests module
     # return response object
     r = requests.get(url + 'query=' + query +
@@ -85,9 +186,8 @@ def get_my_ip():
     print(places)
 
     for key,value in places.items():
-        return '<h1>final list : '+ jsonify(hotels)
-        # return render_template("table_list.html", data = places,city=str(ip.city))
-    #return '<h1>final list : '+ jsonify(hotels) #request.remote_addr
+        return render_template("table_list.html", data = places,city=str(ip.city))
+    return render_template("table_list.html", data = places,city=str(ip.city))
 if __name__ == '__main__':
     app.run(debug=True)
 
