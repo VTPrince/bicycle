@@ -1,0 +1,3 @@
+
+
+curl -X  GET -F -d 'email'=<EMAIL> -F -d 'password'=<PASSWORD> http://localhost:5000/signup

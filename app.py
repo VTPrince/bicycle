@@ -2,6 +2,7 @@
 #     app.run(debug=True)
 from flask import request,Flask,render_template,session,redirect
 from flask import jsonify
+from flask_session import Session
 import geocoder
 import firebase_admin
 import pyrebase
@@ -12,6 +13,11 @@ emaily=[]
 jwtoken=[]
 passwordy=[]
 app = Flask(__name__,template_folder='templates')
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -86,19 +92,20 @@ def logout():
 #Login User
 @app.route('/login',methods=['GET','POST'])
 def login():
-    if('user' in session):
-        return 'hi'
-    else:
-        email = request.form.get('email')
-        #email=emaily[0]
-        #password=passwordy[0]
-        password = request.form.get('password')
-        try:
-            user = pb.auth().sign_in_with_email_and_password(email, password)
-            session['user']=user
-            return {'message': "user logged in"}, 200
-        except:
-            return {'message': 'There was an error logging in'},400
+    email = request.form.get('email')
+    #emaily=emaily[0]
+    emaily.append(email)
+    
+    #password=passwordy[0]
+    password = request.form.get('password')
+    passwordy.append(password)
+    try:
+        user = pb.auth().sign_in_with_email_and_password(email, password)
+        session['user']=user
+        return {'message': "user logged in"}, 200
+    except Exception as e:
+        print(e)
+        return {'messahe':'failed'},400
 
 
 @app.route('/userinfo')
