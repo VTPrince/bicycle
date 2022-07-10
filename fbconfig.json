@@ -2,9 +2,10 @@
     "apiKey": "AIzaSyD_h3snnR9ufe9tOwgLk6OAiCzwjFZg2l0",
     "authDomain": "cycleuser-28697.firebaseapp.com",
     "projectId": "cycleuser-28697",
+    "serviceAccount": "fbAdminConfig.json",
     "storageBucket": "cycleuser-28697.appspot.com",
     "messagingSenderId": "41487912114",
     "appId": "1:41487912114:web:92650385b90d4d35b08dab",
     "measurementId": "G-228YM28HV8",
-    "databaseURL": "https://databaseName.firebaseio.com"
+    "databaseURL": "https://cycleuser-28697-default-rtdb.asia-southeast1.firebasedatabase.app/"
   }
