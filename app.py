@@ -17,12 +17,15 @@ jwtoken=[]
 namely=[]
 passwordy=[]
 app = Flask(__name__,template_folder='templates')
-app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
-app.permanent_session_lifetime = timedelta(minutes=10)
+#app.permanent_session_lifetime = timedelta(minutes=10)
 Session(app)
 
-
+@app.before_first_request  # runs before FIRST request (only once)
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
 @app.route("/")
 def index():
     
