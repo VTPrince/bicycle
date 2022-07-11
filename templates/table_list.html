@@ -235,7 +235,13 @@ a.button.three:hover:after{
 		<div class="table-title">
 		<h3>Places you can go visit</h3>
     <h4>Click on a place and find your travelling buddy</h4>
+	{% if session.user %}
+	You are Logged in {{ session.user }} from
+ {% else %}
+	You are not Logged in, please Login
+ {% endif %}
 		</div>
+		<div>welcome to  {% city %}</div>
 		<table class="table-fill">
 		<thead>
 		<tr>
@@ -249,7 +255,7 @@ a.button.three:hover:after{
 			<tr>
         <span id="wrapper">
           
-			  <td style="border: 1px solid #333" scope="row"><a href="{{ url_for('adddestination',place=key) }}" class="button three">{{ key }}</a></td>
+			  <td style="border: 1px solid #333" scope="row"><a href="{{ url_for('adddestination',place=key,user=session.user) }}" class="button three">{{ key }}</a></td>
 			  <td style="border: 1px solid #333">{{ value }}</td>
       
     </span>

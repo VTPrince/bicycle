@@ -16,10 +16,10 @@ emaily=[]
 jwtoken=[]
 namely=[]
 passwordy=[]
+temp_similar_users=[]
 app = Flask(__name__,template_folder='templates')
 app.config["SESSION_PERMANENT"] = True
 app.config["SESSION_TYPE"] = "filesystem"
-#app.permanent_session_lifetime = timedelta(minutes=10)
 Session(app)
 
 @app.before_first_request  # runs before FIRST request (only once)
@@ -28,8 +28,9 @@ def make_session_permanent():
     app.permanent_session_lifetime = timedelta(minutes=5)
 @app.route("/")
 def index():
-    
+ 
     return render_template("index.html")
+
 @app.route('/user_signup',methods=['POST','GET'])
 def user_signup():
     return render_template('user_signup.html')
@@ -44,7 +45,6 @@ pb = pyrebase.initialize_app(json.load(open('fbconfig.json')))
 db = pb.database()
 #Data source
 users = []
-#Api route to get users
 
 #Api route to sign up a new user
 @app.route('/signup',methods=["GET","POST"])
@@ -65,8 +65,8 @@ def signup():
         data = {"name": name,"email":email}
         db.child("users").child(name).set(data)
 
-        return {'message': f'Successfully created user {user.display_name}'},200
-        #return redirext('/token')
+        #return {'message': f'Successfully created user {user.display_name}'},200
+        return redirect('/')
     except Exception as e:
         print(e)
         return {'message': "error"},400
@@ -111,16 +111,15 @@ def login():
     email = request.form.get('email')
     #emaily=emaily[0]
     emaily.append(email)
-    user_name=db.child("users").order_by_child("email").equal_to('kohli@gmail.com').get()
+    user_name=db.child("users").order_by_child("email").equal_to(email).get()
     for un in user_name.each():
         namely.append(un.key()) 
-    print(namely[0])
     #password=passwordy[0]
     password = request.form.get('password')
     passwordy.append(password)
     try:
         user = pb.auth().sign_in_with_email_and_password(email, password)
-        session['user']=user
+        session['user']=namely[0]
         return redirect('/')
         #return {'message': "user logged in"}, 200
     except Exception as e:
@@ -163,6 +162,7 @@ def get_my_ip():
     else:
         user_ip = request.remote_addr
     ip = geocoder.ip(user_ip)
+    print(ip)
     import requests, json
     import googlemaps
     # enter your api key here
@@ -223,12 +223,39 @@ def get_my_ip():
         return render_template("table_list.html", data = places,city=str(ip.city))
     return render_template("table_list.html", data = places,city=str(ip.city))
 
-@app.route('/adddestination/<string:place>',methods=['GET','POST'])
-def adddestination(place):
-    user_place=place
-    print(namely[0])
-    db.child("users").child(namely[0]).update({"place": user_place}) 
-    return {'message':'destination added'},200
+#add place which user click to visit to user profile in database
+place=""
+@app.route('/adddestination/',methods=['GET','POST'])
+def adddestination():
+    user_place=request.args.get('place',None)
+    user_name=request.args.get('user', None)
+    #print(user_name)
+    db.child("users").child(user_name).update({"place": user_place}) 
+    #return {'message':'destination added'},200
+    place=user_place
+    return render_template("user_place_similar.html",data=place)
+
+#want a buddy travelling to the same place?
+@app.route('/place_buddy')
+def place_buddy():
+    return render_template("user_place_similar.html")
+
+
+@app.route('/get_similar_place')
+def get_similar_place():
+    same_users=db.child("users").order_by_child("place").equal_to(place).get()
+    print(user_place)
+    for una in same_users.each():
+        print(una.key())
+    #     temp_similar_users.append(una.key())
+    #     if una.key()!=namely[0]:
+             
+    return "varan"
+#@app.route('/getinterests')
+#def getinterests():
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
