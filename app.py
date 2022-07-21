@@ -12,6 +12,14 @@ import json
 from firebase_admin import credentials, auth
 from firebase import firebase
 from functools import wraps
+import gspread
+import pandas as pd
+from oauth2client.service_account import ServiceAccountCredentials
+import pickle
+model = pickle.load(open('music_kmeans_model.pkl', 'rb'))
+
+
+
 emaily=[]
 jwtoken=[]
 namely=[]
@@ -70,6 +78,11 @@ def signup():
     except Exception as e:
         print(e)
         return {'message': "error"},400
+
+@app.route('/user_get_interest')
+def user_get_interest():
+    return render_template('user_get_interest.html')
+
 
 #Api route to get a new token for a valid user
 @app.route('/token',methods=["POST","GET"])
@@ -219,8 +232,8 @@ def get_my_ip():
         places[hotels[x]]=distances[x]
     print(places)
 
-    for key,value in places.items():
-        return render_template("table_list.html", data = places,city=str(ip.city))
+    #for key,value in places.items():
+        #return render_template("table_list.html", data = places,city=str(ip.city))
     return render_template("table_list.html", data = places,city=str(ip.city))
 
 #add place which user click to visit to user profile in database
@@ -241,18 +254,64 @@ def place_buddy():
     return render_template("user_place_similar.html")
 
 
-@app.route('/get_similar_place')
+@app.route('/get_similar_place',methods=['GET','POST'])
 def get_similar_place():
-    same_users=db.child("users").order_by_child("place").equal_to(place).get()
+    user_place=request.args.get('place',None)
+    user_name=request.args.get('user', None)
+    same_users=db.child("users").order_by_child("place").equal_to(user_place).get()
     print(user_place)
+    visit_users=[]
     for una in same_users.each():
-        print(una.key())
+        if una.key()!=user_name:
+            visit_users.append(una.key())
+            print(una.key())
     #     temp_similar_users.append(una.key())
     #     if una.key()!=namely[0]:
              
-    return "varan"
-#@app.route('/getinterests')
-#def getinterests():
+    return render_template("user_visit_same.html",data=visit_users)
+#combine with similar users
+
+@app.route('/assign_cluster',methods=['GET','POST'])
+def assign_cluster():
+    user_name=request.args.get('user', None)
+    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+    # add credentials to the account
+    creds = ServiceAccountCredentials.from_json_keyfile_name('drive_cycleuser-28697-2f9f645e3786.json', scope)
+    # authorize the clientsheet
+    client = gspread.authorize(creds)
+    sheet = client.open('Survey')
+    # get the first sheet of the Spreadsheet
+    sheet_instance = sheet.get_worksheet(0)
+    records_data = sheet_instance.get_all_values()
+    records_df = pd.DataFrame.from_dict(records_data)
+    records_df.columns = ['Interests','Pop','Rap','Rock n Roll','Reading','Gardening','Arts and Crafts','Playing musical instruments','0','0',]
+    records_df=records_df.loc[1:,['Interests','Pop','Rap','Rock n Roll','Reading','Gardening','Arts and Crafts','Playing musical instruments']]
+    if(records_df.iloc[-1][0]=='Music'):
+        user_music = records_df[(records_df.Interests == 'Music')]
+        user_music=user_music.loc[:,['Pop','Rap','Rock n Roll']]
+        mat = [user_music.iloc[-1].values]
+        newmat=model.predict(mat)
+        newmat=newmat[0]
+        print(newmat)
+        session['cluster']=newmat
+        session['nuser']=user_name
+        db.child("users").child(user_name).update({"interest": "Music"}) 
+        db.child("users").child(user_name).update({"cluster": int(newmat)}) 
+    #return {'message':'cluster assigned'},200
+    return redirect('/get_similar_people')
+
+
+@app.route('/get_similar_people',methods=['GET','POST'])
+def get_similar_people():
+    cluster_num=session['cluster']
+    user_name=session['nuser']
+    same_users=db.child("users").order_by_child("cluster").equal_to(cluster_num).get()
+    visit_users=[]
+    for una in same_users.each():
+        if una.key()!=user_name:
+            visit_users.append(una.key())
+            print(una.key())
+    return{'message':'similar users found'},200
 
 
 

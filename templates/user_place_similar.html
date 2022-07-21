@@ -87,10 +87,8 @@
     <div class="container layout_padding2-top">
       <div class="row">
         <div class="col-md-6 mx-auto">
-          <form action="{{ url_for('get_similar_place') }}" method="POST">
-            <div>
-              <input type="text" placeholder="Your Search Query">
-            </div>
+          <form action="{{ url_for('get_similar_place',place=data,user=session.user) }}" method="POST">
+            <div>Do you want a travel buddy to accompany you to this place?</div>
             
             <div class="d-flex justify-content-center ">
               <button>
