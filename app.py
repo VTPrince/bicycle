@@ -311,7 +311,8 @@ def get_similar_people():
         if una.key()!=user_name:
             visit_users.append(una.key())
             print(una.key())
-    return{'message':'similar users found'},200
+            return render_template("view_same_user.html")
+    return{'message':'no similar users found'},200
 
 
 
