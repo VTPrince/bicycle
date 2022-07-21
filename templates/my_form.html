@@ -55,14 +55,15 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('about')}}"> About </a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{{url_for('service')}}"> Services </a>
-                </li>
+
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('my_form')}}">Explore</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('user_login')}}">Login</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('user_get_interest')}}">Add Interest</a>
                 </li>
               </ul>
             </div>
@@ -78,8 +79,8 @@
 
   <!-- contact section -->
 
-  <section class="contact_section layout_padding">
-    <div class="custom_heading-container">
+  <section style="padding-top: 35px;padding-bottom: 35px;" class="contact_section layout_padding">
+    <div  class="custom_heading-container">
       <h3 class=" ">
         Explore Destinations You Can Visit
       </h3>
@@ -98,6 +99,11 @@
   </section>
 
   <!-- end contact section -->
+  <section>
+    <div class="img-box">
+      <img style="padding-left: 550px;padding-bottom: 50px;" src="{{url_for('static',filename='images/astro.png')}}" alt="">
+    </div>
+  </section>
 
   <!-- info section -->
   <section class="info_section layout_padding">

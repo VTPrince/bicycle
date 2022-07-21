@@ -92,6 +92,9 @@
                 <li class="nav-item">
                   <a class="nav-link" href="{{url_for('user_login')}}">Login</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('user_get_interest')}}">Add Interest</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -119,7 +122,7 @@
           
             <div class="d-flex justify-content-center "><button data-tf-popup="ucrtyqA6" data-tf-size="70" data-tf-iframe-props="title=My typeform" data-tf-medium="snippet" style="all:unset;font-family:Helvetica,Arial,sans-serif;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background-color:#FF4F5A;color:#000000;font-size:16px;border-radius:20px;padding:0 26px;font-weight:bold;height:40px;cursor:pointer;line-height:40px;text-align:center;margin:0;text-decoration:none;" type="submit">Click to fill form</button><script src="//embed.typeform.com/next/embed.js"></script> </div>
           
-          <form action="{{ url_for('assign_cluster',user=session.user) }}" method="POST"><button type="Submit">Send data</button></form>
+          <form action="{{ url_for('assign_cluster',user=session.user) }}" method="POST"><button style="margin-top: 75px;margin-left: 190px;" type="Submit">Send data</button></form>
           </div>
       </div>
 
